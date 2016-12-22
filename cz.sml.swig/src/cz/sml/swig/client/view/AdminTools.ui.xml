@@ -1,0 +1,96 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+	<ui:style field="localStyle">
+		.adminTools {
+			margin: auto;
+			width: 800px;
+		}
+		
+		@external .gwt-Button, .gwt-CheckBox;
+		.adminTools .gwt-Button, .adminTools .gwt-CheckBox label {
+			white-space: nowrap;
+		}
+		
+		.rolesTable {
+			width: 100%;
+		}
+		
+		.rolesTable input {
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 0px 3px;
+			color: #444;
+		}
+		
+		.mapperEditor {
+			width: 790px;
+			height: 400px;
+			resize: none;
+			margin-top: 5px;
+			border: 1px solid #ddd;
+			font-family: monospace;
+			font-size: 12px;
+		}
+		
+		.linkButtonWrapper {
+			background-color: #eee;
+			border-radius: 5px;
+		}
+		
+		.linkButtonWrapper .gwt-Button[disabled], .linkButtonWrapper .gwt-Button[disabled]:hover {
+			background: none;
+			border: none;
+			text-decoration: none;
+			color: #bbb;
+		}
+		
+		.linkButtonWrapper .gwt-Button {
+			background: none;
+			border: none;
+			color: #8888ee;
+		}
+		
+		.linkButtonWrapper .gwt-Button:hover {
+			text-decoration: underline;
+		}
+		
+		.lowerPanel {
+			margin-top: 30px;
+		}
+		
+		.compilationStatus {
+			text-align: right;
+			margin-top: 3px;
+			color: #888;
+		}
+	</ui:style>
+	<g:FlowPanel addStyleNames="{localStyle.adminTools}">
+		<g:Label addStyleNames="heading">Správa přístupových rolí</g:Label>
+		<g:FlowPanel>
+			<g:HorizontalPanel addStyleNames="{localStyle.linkButtonWrapper}" verticalAlignment="middle">
+				<g:Button ui:field="addRole">Přidat roli</g:Button>
+				<g:Button ui:field="removeSelectedRoles" enabled="false">Smazat označené role</g:Button>
+				<g:cell width="100%">
+					<g:SimplePanel/>
+				</g:cell>
+				<g:Button ui:field="confirmChangesRoles" enabled="false">Uložit změny</g:Button>
+				<g:Button ui:field="cancelChangesRoles" enabled="false">Storno</g:Button>
+			</g:HorizontalPanel>
+			<cell:CellTable ui:field="accessRolesTable" addStyleNames="{localStyle.rolesTable}"/>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="{localStyle.lowerPanel}">
+			<g:HorizontalPanel addStyleNames="{localStyle.linkButtonWrapper}" verticalAlignment="middle">
+				<g:CheckBox ui:field="useCustomRoleMapper">Použít vlastní skript pro mapování rolí</g:CheckBox>
+				<g:cell width="100%">
+					<g:SimplePanel/>
+				</g:cell>
+				<g:Button ui:field="confirmChangesRoleMapper" enabled="false">Uložit změny</g:Button>
+				<g:Button ui:field="cancelChangesRoleMapper" enabled="false">Storno</g:Button>
+			</g:HorizontalPanel>
+			<g:TextArea ui:field="customRoleMapper" addStyleNames="{localStyle.mapperEditor}"/>
+			<g:Label ui:field="mapperCompilationStatus" addStyleNames="{localStyle.compilationStatus}"/>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder> 

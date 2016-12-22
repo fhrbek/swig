@@ -1,0 +1,161 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder 
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	
+	<ui:with field="res" type="cz.sml.swig.client.ResourceBundle"/>
+  	<ui:style field="localStyle">
+		.absoluteFull {
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			bottom: 0px;
+			left: 0px;
+		}
+		
+		.fullSize {
+			height: 100%;
+			width: 100%;
+		}
+		
+		.fullCenter {
+			text-align: center;
+			vertical-align: center;
+		}
+		
+		.splashScreenBase {
+			position: relative;
+			width: 500px;
+			height: 375px;
+			margin: auto;
+			border: 1px solid transparent;
+			background-color: transparent;
+			border-radius: 20px;
+			-moz-border-radius: 20px;
+			-webkit-border-radius: 20px;
+			box-shadow: 0px 0px 5px #AAAAAA;
+			-moz-box-shadow: 0px 0px 5px #AAAAAA;
+			-webkit-box-shadow: 0px 0px 5px #AAAAAA;
+			text-align: center;
+		}
+		
+		.splashScreenBackground {
+			background-color: #bbeeff;
+		}
+		
+  		.gridTable {
+			width: 100%;
+		}
+
+		.gridTable td, .gridTable th {
+			padding: 5px;
+			border-bottom: 1px solid #aaaaaa;
+			text-align: left;
+			vertical-align: middle;
+		}
+		
+		.gridTable tr:last-child td {
+			border-bottom: none;
+		}
+		
+		.gridTable th {
+			color: #333333;
+		}
+
+		.gridTable td {
+			color: #555555;
+		}
+
+		.infoContainer {
+			position: absolute;
+			top: 10px;
+			bottom: 20px;
+			left: 10px;
+			right: 10px;
+		}
+		
+		.heading {
+			font-size: 20px;
+			font-weight: bold;
+			color: red;
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+		
+		.detectedBrowser {
+			font-size: 14px;
+			font-style: italic;
+			color: red;
+		}
+		
+		.text {
+			color: #555555;
+			padding-top: 10px;
+			padding-bottom: 10px;
+			text-align: left;
+		}
+  	</ui:style>
+  	
+  	<g:HTMLPanel>
+  		<!-- This is very similar to the stuff in the initial HTML - it's intentional to fit exactly into the splash screen window -->
+	    <div class="{localStyle.absoluteFull}">
+   			<table class="{localStyle.fullSize}">
+		    	<tr>
+		    		<td class="{localStyle.fullCenter}">
+					    <table class="{localStyle.fullSize}">
+	    					<tr>
+	    						<td style="text-align: center; vertical-align: center;">
+		    						<div class="{localStyle.splashScreenBase} {localStyle.splashScreenBackground}">
+
+		    							<div class="{localStyle.infoContainer}">
+		    								<g:Label addStyleNames="{localStyle.heading}">NEPODPOROVANÝ PROHLÍŽEČ</g:Label>
+		    								<g:Label ui:field="detectedBrowser" addStyleNames="{localStyle.detectedBrowser}"/>
+		    								<g:HTML ui:field="message" addStyleNames="{localStyle.text}">Litujeme, ale tento prohlížeč není aplikací podporován. Spusťte aplikaci v jednom z níže uvedených prohlížečů, které jsou k dispozici ke stažení zdarma.</g:HTML>
+									 		<table cellpadding="0" cellspacing="0" class="{localStyle.gridTable}">
+									 			<colgroup>
+									 				<col width="10%"/>
+									 				<col width="30%"/>
+									 				<col width="20%"/>
+									 				<col width="40%"/>
+									 			</colgroup>
+									 			<tr>
+									 				<th colspan="3">Prohlížeč</th>
+									 				<th>Poznámka</th>
+									 			</tr>
+									 			<tr>
+									 				<td><g:Image resource="{res.firefox}"/></td>
+									 				<td>Mozilla Firefox 7+</td>
+									 				<td><a href="http://www.mozilla.org" target="_blank">Stáhnout</a></td>
+									 				<td>Plně kompatibilní s aplikací.</td>
+									 			</tr>
+									 			<tr>
+									 				<td><g:Image resource="{res.chrome}"/></td>
+									 				<td>Google Chrome 15+</td>
+									 				<td><a href="https://www.google.com/chrome" target="_blank">Stáhnout</a></td>
+									 				<td>Plně kompatibilní s aplikací.</td>
+									 			</tr>
+									 			<tr>
+									 				<td><g:Image resource="{res.opera}"/></td>
+									 				<td>Opera 12+</td>
+									 				<td><a href="http://www.opera.com/download" target="_blank">Stáhnout</a></td>
+									 				<td>Plně kompatibilní s aplikací.</td>
+									 			</tr>
+									 			<tr>
+									 				<td><g:Image resource="{res.safari}"/></td>
+									 				<td>Safari 5+</td>
+									 				<td><a href="http://www.apple.com/safari" target="_blank">Stáhnout</a></td>
+									 				<td>Plně kompatibilní s aplikací.</td>
+									 			</tr>
+									 		</table>
+		    							</div>
+		    						</div>
+	    						</td>
+	    					</tr>
+	    				</table>
+		    		</td>
+		    	</tr>
+		    </table>
+	    </div>
+  	</g:HTMLPanel>
+
+</ui:UiBinder> 

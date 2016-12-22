@@ -1,0 +1,6 @@
+<project name="WAR builder" default="build">
+	<target name="build">
+		<mkdir dir="release"/>
+		<war destfile="release/swig.war" basedir="war"/>
+	</target>
+</project>

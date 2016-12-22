@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee">
+
+  <!-- Listeners -->
+  <listener>
+    <listener-class>cz.sml.swig.server.ImageScanner</listener-class>
+  </listener>
+
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>serviceServlet</servlet-name>
+    <servlet-class>cz.sml.swig.server.SwigServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>imageServlet</servlet-name>
+    <servlet-class>cz.sml.swig.server.ImageServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>logServlet</servlet-name>
+    <servlet-class>cz.sml.swig.server.LogServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>roleMapperServlet</servlet-name>
+    <servlet-class>cz.sml.swig.server.RoleMapperServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>serviceServlet</servlet-name>
+    <url-pattern>/swig/service</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>imageServlet</servlet-name>
+    <url-pattern>/image</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>logServlet</servlet-name>
+    <url-pattern>/log</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>roleMapperServlet</servlet-name>
+    <url-pattern>/rolemapper/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>swig.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

@@ -1,0 +1,21 @@
+@def iconMarginBottom 5px;
+
+@sprite .folderIcon {
+	gwt-image: 'folderIcon';
+	margin-bottom: iconMarginBottom;
+}
+
+@sprite .imageIcon {
+	gwt-image: 'imageIcon';
+	margin-bottom: iconMarginBottom;
+}
+
+@sprite .videoIcon {
+	gwt-image: 'videoIcon';
+	margin-bottom: iconMarginBottom;
+}
+
+@sprite .imageAndVideoIcon {
+	gwt-image: 'imageAndVideoIcon';
+	margin-bottom: iconMarginBottom;
+}

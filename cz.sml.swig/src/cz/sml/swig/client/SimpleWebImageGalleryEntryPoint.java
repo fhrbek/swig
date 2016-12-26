@@ -13,6 +13,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Position;
@@ -95,7 +96,7 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 	private static final int ANIMATION_DURATION = 300;
 
-	private static final int PLAYER_NAVIGATION_BOTTOM_OFFSET = 5;
+	private static final int PLAYER_NAVIGATION_TOP_OFFSET = 15;
 
 	private static final int PLAYER_CONTROL_BUTTON_GAP = 20;
 
@@ -1020,6 +1021,9 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 					@Override
 					public void onSuccess(final MediaMetadata[] imagesOrVideos) {
 						final int currentImageIndexRef[] = new int[] { -1 };
+						final boolean fullScreen[] = new boolean[] { false };
+						final String blackGlassBackground = "black";
+						final String semitransparentGlassBackground = "rgba(0, 0, 0, 0.6)";
 						int index = 0;
 
 						for(MediaMetadata metadata : imagesOrVideos) {
@@ -1047,7 +1051,9 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						style.setRight(0.0, Unit.PX);
 						style.setBottom(0.0, Unit.PX);
 						style.setLeft(0.0, Unit.PX);
-						style.setBackgroundColor("rgba(0, 0, 0, 0.6)");
+						style.setBackgroundColor(fullScreen[0]
+								? blackGlassBackground
+								: semitransparentGlassBackground);
 						style.setOpacity(0.0);
 						style.setVisibility(Visibility.HIDDEN);
 
@@ -1083,56 +1089,66 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 							}
 
 						});
+						downloadSelector.getElement().getStyle().setZIndex(2);
 						player.add(downloadSelector);
+
+						final FlowPanel controlPanel = new FlowPanel();
+						controlPanel.addStyleName("playerControlPanel");
+						if(fullScreen[0])
+							player.addStyleName("fullScreen");
+						style = controlPanel.getElement().getStyle();
+						style.setPaddingRight(PLAYER_IMAGE_OFFSET, Unit.PX);
+						style.setZIndex(2);
+
+						player.add(controlPanel);
 
 						final Anchor downloadAnchor = new Anchor();
 						downloadAnchor.setTitle("Stáhnout obrázek v plné velikosti");
 						style = downloadAnchor.getElement().getStyle();
 						style.setPosition(Position.ABSOLUTE);
 						style.setLeft(PLAYER_IMAGE_OFFSET, Unit.PX);
-						style.setBottom(PLAYER_NAVIGATION_BOTTOM_OFFSET, Unit.PX);
+						style.setTop(PLAYER_NAVIGATION_TOP_OFFSET, Unit.PX);
 
 						setDownloadAnchor(downloadAnchor, galleryPath, imagesOrVideos[currentImageIndexRef[0]]);
 
-						player.add(downloadAnchor);
-
-						FlowPanel controlPanel = new FlowPanel();
-						style = controlPanel.getElement().getStyle();
-						style.setPosition(Position.ABSOLUTE);
-						style.setRight(PLAYER_IMAGE_OFFSET, Unit.PX);
-						style.setBottom(PLAYER_NAVIGATION_BOTTOM_OFFSET - PLAYER_CONTROL_PANEL_CORRECTION, Unit.PX);
-
-						player.add(controlPanel);
+						controlPanel.add(downloadAnchor);
 
 						final int[] imageSizeToFit = new int[2]; // {width,height}
-						computeImageSize(imagesOrVideos[currentImageIndexRef[0]], imageSizeToFit);
+						computeImageSize(imagesOrVideos[currentImageIndexRef[0]], imageSizeToFit, fullScreen[0], false);
 
-						final Widget[] mediaWidgetRef = new Widget[] { createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]]) };
+						final Widget[] mediaWidgetRef = new Widget[] { createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]], fullScreen[0]) };
 
 						player.add(mediaWidgetRef[0]);
 
 						style = mediaWidgetRef[0].getElement().getStyle();
 						style.setPosition(Position.ABSOLUTE);
-						style.setTop(PLAYER_IMAGE_OFFSET, Unit.PX);
-						style.setLeft(PLAYER_IMAGE_OFFSET, Unit.PX);
+						style.setTop(fullScreen[0]
+								? 0
+								: PLAYER_IMAGE_OFFSET, Unit.PX);
+						style.setLeft(fullScreen[0]
+								? 0
+								: PLAYER_IMAGE_OFFSET, Unit.PX);
 						style.setCursor(Cursor.POINTER);
+						style.setZIndex(1);
 
 						if(mediaWidgetRef[0] instanceof Image)
-							adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], style);
-						else
-							adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], style, mediaWidgetRef[0].getElement().getFirstChildElement()
-									.getStyle());
+							adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], fullScreen[0], style);
+						else {
+							adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], fullScreen[0], style, mediaWidgetRef[0].getElement()
+									.getFirstChildElement().getStyle());
+							downloadSelector.getElement().getStyle().setDisplay(Display.NONE);
+						}
 
 						final HandlerRegistration resizeHandler = Window.addResizeHandler(new ResizeHandler() {
 
 							@Override
 							public void onResize(ResizeEvent event) {
-								computeImageSize(imagesOrVideos[currentImageIndexRef[0]], imageSizeToFit);
+								computeImageSize(imagesOrVideos[currentImageIndexRef[0]], imageSizeToFit, fullScreen[0], false);
 								if(mediaWidgetRef[0] instanceof Image)
-									adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], mediaWidgetRef[0].getElement().getStyle());
+									adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], fullScreen[0], mediaWidgetRef[0].getElement().getStyle());
 								else
-									adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], mediaWidgetRef[0].getElement().getStyle(),
-											mediaWidgetRef[0].getElement().getFirstChildElement().getStyle());
+									adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], fullScreen[0],
+											mediaWidgetRef[0].getElement().getStyle(), mediaWidgetRef[0].getElement().getFirstChildElement().getStyle());
 							}
 
 						});
@@ -1142,6 +1158,7 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						previous.getElement().setInnerHTML("&laquo;");
 						previous.getElement().getStyle().setDisplay(Display.INLINE);
 						previous.getElement().getStyle().setMarginRight(PLAYER_CONTROL_BUTTON_GAP, Unit.PX);
+						previous.getElement().getStyle().setZIndex(2);
 						previous.addStyleName("controlButtonLabel");
 						if(currentImageIndexRef[0] > 0)
 							previous.addStyleName("enabled");
@@ -1154,6 +1171,8 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						next.setTitle("Další obrázek");
 						next.getElement().setInnerHTML("&raquo;");
 						next.getElement().getStyle().setDisplay(Display.INLINE);
+						next.getElement().getStyle().setMarginRight(PLAYER_CONTROL_BUTTON_GAP, Unit.PX);
+						next.getElement().getStyle().setZIndex(2);
 						next.addStyleName("controlButtonLabel");
 						if(currentImageIndexRef[0] < imagesOrVideos.length - 1)
 							next.addStyleName("enabled");
@@ -1161,6 +1180,17 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 							next.removeStyleName("enabled");
 
 						controlPanel.add(next);
+
+						final Label toggleFullScreen = new Label();
+						toggleFullScreen.setTitle("Celá obrazovka");
+						toggleFullScreen.getElement().setInnerHTML("&#x1f5b5;");
+						toggleFullScreen.getElement().getStyle().setDisplay(Display.INLINE);
+						toggleFullScreen.getElement().getStyle().setZIndex(2);
+						toggleFullScreen.addStyleName("controlButtonLabel");
+						toggleFullScreen.addStyleName("fullScreenButtonLabel");
+						toggleFullScreen.addStyleName("enabled");
+
+						controlPanel.add(toggleFullScreen);
 
 						final HandlerRegistration[] keyReg = new HandlerRegistration[1];
 
@@ -1221,14 +1251,14 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 								}
 
 								currentImageIndexRef[0]++;
-								Widget newMedia = createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]]);
+								Widget newMedia = createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]], fullScreen[0]);
 								if(newMedia instanceof HasClickHandlers)
 									((HasClickHandlers) newMedia).addClickHandler(imageClickHandlerRef[0]);
-								transition(player, galleryPath, imagesOrVideos, mediaWidgetRef, imageSizeToFit, newMedia, next, previous, downloadAnchor,
-										downloadSelector, downloadSelectors, currentImageIndexRef[0], oldIndex);
+								transition(player, galleryPath, imagesOrVideos, mediaWidgetRef, imageSizeToFit, newMedia, next, previous, toggleFullScreen,
+										downloadAnchor, downloadSelector, downloadSelectors, currentImageIndexRef[0], oldIndex, fullScreen[0], false);
 
 								if(currentImageIndexRef[0] < imagesOrVideos.length - 1)
-									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] + 1].getName(), "preview"));
+									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] + 1].getName(), fullScreen[0]));
 							}
 
 							void previous(boolean closeOnEdge) {
@@ -1245,14 +1275,41 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 								}
 
 								currentImageIndexRef[0]--;
-								Widget newMedia = createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]]);
+								Widget newMedia = createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]], fullScreen[0]);
 								if(newMedia instanceof HasClickHandlers)
 									((HasClickHandlers) newMedia).addClickHandler(imageClickHandlerRef[0]);
-								transition(player, galleryPath, imagesOrVideos, mediaWidgetRef, imageSizeToFit, newMedia, next, previous, downloadAnchor,
-										downloadSelector, downloadSelectors, currentImageIndexRef[0], oldIndex);
+								transition(player, galleryPath, imagesOrVideos, mediaWidgetRef, imageSizeToFit, newMedia, next, previous, toggleFullScreen,
+										downloadAnchor, downloadSelector, downloadSelectors, currentImageIndexRef[0], oldIndex, fullScreen[0], false);
 
 								if(currentImageIndexRef[0] > 0)
-									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] - 1].getName(), "preview"));
+									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] - 1].getName(), fullScreen[0]));
+							}
+
+							void toggleFullScreen() {
+								if(!playing)
+									return;
+
+								fullScreen[0] = !fullScreen[0];
+								Widget newMedia = createMediaWidget(galleryPath, imagesOrVideos[currentImageIndexRef[0]], fullScreen[0]);
+								if(newMedia instanceof HasClickHandlers)
+									((HasClickHandlers) newMedia).addClickHandler(imageClickHandlerRef[0]);
+								transition(player, galleryPath, imagesOrVideos, mediaWidgetRef, imageSizeToFit, newMedia, next, previous, toggleFullScreen,
+										downloadAnchor, downloadSelector, downloadSelectors, currentImageIndexRef[0], currentImageIndexRef[0], fullScreen[0],
+										true);
+								glassPanel.getElement().getStyle().setBackgroundColor(fullScreen[0]
+										? blackGlassBackground
+										: semitransparentGlassBackground);
+
+								if(currentImageIndexRef[0] > 0)
+									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] - 1].getName(), fullScreen[0]));
+
+								if(currentImageIndexRef[0] < imagesOrVideos.length - 1)
+									Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] + 1].getName(), fullScreen[0]));
+
+								if(fullScreen[0])
+									player.addStyleName("fullScreen");
+								else
+									player.removeStyleName("fullScreen");
 							}
 						}
 
@@ -1267,6 +1324,13 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 							@Override
 							public void onClick(ClickEvent event) {
 								previous(event.getSource() instanceof Image);
+							}
+						}
+
+						class FullScreenClickController extends Controller implements ClickHandler {
+							@Override
+							public void onClick(ClickEvent event) {
+								toggleFullScreen();
 							}
 						}
 
@@ -1292,6 +1356,9 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 									event.stopPropagation();
 									event.preventDefault();
 									break;
+								case KeyCodes.KEY_F:
+									toggleFullScreen();
+									break;
 								}
 							}
 
@@ -1316,6 +1383,10 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 						previous.addClickHandler(previousClickHandler);
 
+						final ClickHandler fullScreenClickHandler = new FullScreenClickController();
+
+						toggleFullScreen.addClickHandler(fullScreenClickHandler);
+
 						imageClickHandlerRef[0] = new ClickHandler() {
 
 							@Override
@@ -1338,6 +1409,11 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 						keyReg[0] = RootPanel.get().addDomHandler(keyHandler, KeyDownEvent.getType());
 
+						FlowPanel topControlPanel = new FlowPanel();
+						topControlPanel.addStyleName("playerTopControlPanel");
+						topControlPanel.getElement().getStyle().setZIndex(2);
+						player.add(topControlPanel);
+
 						Label close = new Label();
 						close.setTitle("Zavřít okno");
 						close.getElement().setInnerHTML("&#10006;");
@@ -1346,20 +1422,20 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						close.addStyleName("enabled");
 						style = close.getElement().getStyle();
 						style.setPosition(Position.ABSOLUTE);
-						style.setTop(CLOSE_BUTTON_OFFSET, Unit.PX);
 						style.setRight(CLOSE_BUTTON_OFFSET, Unit.PX);
+						style.setBottom(CLOSE_BUTTON_OFFSET, Unit.PX);
 
 						close.addDomHandler(closeHandler, ClickEvent.getType());
 
-						player.add(close);
+						topControlPanel.add(close);
 
 						centerer.add(player);
 
 						if(currentImageIndexRef[0] > 0)
-							Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] - 1].getName(), "preview"));
+							Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] - 1].getName(), fullScreen[0]));
 
 						if(currentImageIndexRef[0] < imagesOrVideos.length - 1)
-							Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] + 1].getName(), "preview"));
+							Image.prefetch(createImageUri(galleryPath, imagesOrVideos[currentImageIndexRef[0] + 1].getName(), fullScreen[0]));
 
 						Animation fadeIn = new Animation() {
 
@@ -1400,10 +1476,10 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						fadeIn.run(ANIMATION_DURATION);
 					}
 
-					private Widget createMediaWidget(String galleryPath, MediaMetadata mediaMetadata) {
+					private Widget createMediaWidget(String galleryPath, MediaMetadata mediaMetadata, boolean fullScreen) {
 						switch (mediaMetadata.getType()) {
 						case IMAGE:
-							return new Image(createImageUri(galleryPath, mediaMetadata.getName(), "preview"));
+							return new Image(createImageUri(galleryPath, mediaMetadata.getName(), fullScreen));
 						case VIDEO:
 							SimplePanel wrapper = new SimplePanel();
 							IFrameElement iframe = Document.get().createIFrameElement();
@@ -1417,9 +1493,13 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						}
 					}
 
-					private void adjustImageSize(Style playerStyle, int imageWidth, int imageHeight, Style... mediaStyles) {
-						playerStyle.setWidth(imageWidth + PLAYER_EXTRA_WIDTH, Unit.PX);
-						playerStyle.setHeight(imageHeight + PLAYER_EXTRA_HEIGHT, Unit.PX);
+					private void adjustImageSize(Style playerStyle, int imageWidth, int imageHeight, boolean fullScreen, Style... mediaStyles) {
+						playerStyle.setWidth(imageWidth + (fullScreen
+								? 0
+								: PLAYER_EXTRA_WIDTH), Unit.PX);
+						playerStyle.setHeight(imageHeight + (fullScreen
+								? 0
+								: PLAYER_EXTRA_HEIGHT), Unit.PX);
 
 						for(Style mediaStyle : mediaStyles) {
 							mediaStyle.setWidth(imageWidth, Unit.PX);
@@ -1427,12 +1507,20 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						}
 					}
 
-					private void computeImageSize(MediaMetadata imageMetadata, int[] size) {
-						int imageWidth = imageMetadata.getPreviewWidth();
-						int imageHeight = imageMetadata.getPreviewHeight();
+					private void computeImageSize(MediaMetadata imageMetadata, int[] size, boolean fullScreen, boolean fullScreenChange) {
+						int imageWidth = fullScreen
+								? Window.getClientWidth()
+								: imageMetadata.getPreviewWidth();
+						int imageHeight = fullScreen
+								? imageWidth * imageMetadata.getPreviewHeight() / imageMetadata.getPreviewWidth()
+								: imageMetadata.getPreviewHeight();
 
-						int totalPlayerWidth = imageWidth + PLAYER_EXTRA_WIDTH + 2 * PLAYER_MINIMUM_MARGIN;
-						int totalPlayerHeight = imageHeight + PLAYER_EXTRA_HEIGHT + 2 * PLAYER_MINIMUM_MARGIN;
+						int totalPlayerWidth = imageWidth + (fullScreen && !fullScreenChange
+								? 0
+								: PLAYER_EXTRA_WIDTH + 2 * PLAYER_MINIMUM_MARGIN);
+						int totalPlayerHeight = imageHeight + (fullScreen && !fullScreenChange
+								? 0
+								: PLAYER_EXTRA_HEIGHT + 2 * PLAYER_MINIMUM_MARGIN);
 
 						int horizontalOverflow = totalPlayerWidth - Window.getClientWidth();
 						int verticalOverflow = totalPlayerHeight - Window.getClientHeight();
@@ -1477,8 +1565,10 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 					}
 
-					private String createImageUri(String gallery, String name, String format) {
-						return "image?path=" + UriUtils.encode(gallery + "/" + name) + "&format=" + format;
+					private String createImageUri(String gallery, String name, boolean fullScreen) {
+						return "image?path=" + UriUtils.encode(gallery + "/" + name) + "&format=" + (fullScreen
+								? "original"
+								: "preview");
 					}
 
 					private void setDownloadAnchor(Anchor downloadAnchor, String gallery, MediaMetadata imageMetadata) {
@@ -1493,11 +1583,13 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 					}
 
 					private void transition(final FlowPanel player, final String gallery, final MediaMetadata[] imagesOrVideos, final Widget[] media,
-							final int[] imageSizeToFit, final Widget newMedia, final Label next, final Label previous, final Anchor downloadAnchor,
-							final CheckBox downloadSelector, final CheckBox[] downloadSelectors, final int currentIndex, final int oldIndex) {
+							final int[] imageSizeToFit, final Widget newMedia, final Label next, final Label previous, final Label toggleFullScreen,
+							final Anchor downloadAnchor, final CheckBox downloadSelector, final CheckBox[] downloadSelectors, final int currentIndex,
+							final int oldIndex, final boolean fullScreen, final boolean fullScreenChange) {
 
 						previous.removeStyleName("enabled");
 						next.removeStyleName("enabled");
+						toggleFullScreen.removeStyleName("enabled");
 						downloadSelector.getElement().getStyle().setDisplay(Display.NONE);
 
 						final Style playerStyle = player.getElement().getStyle();
@@ -1513,7 +1605,7 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 						final int oldWidth = imageSizeToFit[0];
 						final int oldHeight = imageSizeToFit[1];
 
-						computeImageSize(imagesOrVideos[currentIndex], imageSizeToFit);
+						computeImageSize(imagesOrVideos[currentIndex], imageSizeToFit, fullScreen, fullScreenChange);
 
 						final int newWidth = imageSizeToFit[0];
 						final int newHeight = imageSizeToFit[1];
@@ -1526,8 +1618,12 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 							protected void onStart() {
 								super.onStart();
 								newImageStyle.setPosition(Position.ABSOLUTE);
-								newImageStyle.setTop(PLAYER_IMAGE_OFFSET, Unit.PX);
-								newImageStyle.setLeft(PLAYER_IMAGE_OFFSET, Unit.PX);
+								newImageStyle.setTop(fullScreen && !fullScreenChange
+										? 0
+										: PLAYER_IMAGE_OFFSET, Unit.PX);
+								newImageStyle.setLeft(fullScreen && !fullScreenChange
+										? 0
+										: PLAYER_IMAGE_OFFSET, Unit.PX);
 								newImageStyle.setWidth(oldWidth, Unit.PX);
 								newImageStyle.setHeight(oldHeight, Unit.PX);
 								newImageStyle.setCursor(Cursor.POINTER);
@@ -1536,6 +1632,21 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 								if(newVideoStyle != null) {
 									newVideoStyle.setWidth(oldWidth, Unit.PX);
 									newVideoStyle.setHeight(oldHeight, Unit.PX);
+								}
+
+								if(!fullScreen && fullScreenChange) {
+									computeImageSize(imagesOrVideos[currentIndex], imageSizeToFit, false, false);
+									oldImageStyle.setTop(PLAYER_IMAGE_OFFSET, Unit.PX);
+									oldImageStyle.setLeft(PLAYER_IMAGE_OFFSET, Unit.PX);
+									oldImageStyle.setWidth(imageSizeToFit[0], Unit.PX);
+									oldImageStyle.setHeight(imageSizeToFit[1], Unit.PX);
+
+									if(media[0] instanceof Image)
+										adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], false, playerStyle);
+									else
+										adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], false, playerStyle, oldVideoStyle);
+
+									playerStyle.clearBorderStyle();
 								}
 
 								player.add(newMedia);
@@ -1563,8 +1674,12 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 									newVideoStyle.setHeight(height, Unit.PX);
 								}
 
-								playerStyle.setWidth(width + PLAYER_EXTRA_WIDTH, Unit.PX);
-								playerStyle.setHeight(height + PLAYER_EXTRA_HEIGHT, Unit.PX);
+								playerStyle.setWidth(width + (fullScreen && !fullScreenChange
+										? 0
+										: PLAYER_EXTRA_WIDTH), Unit.PX);
+								playerStyle.setHeight(height + (fullScreen && !fullScreenChange
+										? 0
+										: PLAYER_EXTRA_HEIGHT), Unit.PX);
 							}
 
 							@Override
@@ -1577,7 +1692,7 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 								media[0] = newMedia;
 
 								Boolean downloadSelectorValue = selectionStatus(downloadSelectors, currentIndex, null);
-								if(downloadSelectorValue != null) {
+								if(downloadSelectorValue != null && newMedia instanceof Image) {
 									downloadSelector.setValue(downloadSelectorValue);
 									downloadSelector.getElement().getStyle().clearDisplay();
 								}
@@ -1587,6 +1702,22 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 								if(currentIndex < imagesOrVideos.length - 1)
 									next.addStyleName("enabled");
+
+								toggleFullScreen.addStyleName("enabled");
+
+								if(fullScreen && fullScreenChange) {
+									computeImageSize(imagesOrVideos[currentIndex], imageSizeToFit, true, false);
+									newImageStyle.setTop(0, Unit.PX);
+									newImageStyle.setLeft(0, Unit.PX);
+									newImageStyle.setWidth(imageSizeToFit[0], Unit.PX);
+									newImageStyle.setHeight(imageSizeToFit[1], Unit.PX);
+									if(newMedia instanceof Image)
+										adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], true, playerStyle);
+									else
+										adjustImageSize(playerStyle, imageSizeToFit[0], imageSizeToFit[1], true, playerStyle, newVideoStyle);
+
+									playerStyle.setBorderStyle(BorderStyle.NONE);
+								}
 							}
 
 						};

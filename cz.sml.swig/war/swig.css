@@ -168,12 +168,64 @@ img {
 	-ms-user-select: none;
 }
 
+.playerControlPanel {
+	position: absolute;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	border-radius: 0 0 6px 6px;
+	text-align: right;	
+}
+
+.player.fullScreen .playerControlPanel {
+	background: linear-gradient(to top, #fff, 85%, rgba(255, 255, 255, 0));
+	opacity: 0;
+	height: 5px;
+	transition: height 0.5s, opacity 1s;
+	transition-delay: 1s;
+}
+
+.player.fullScreen .playerControlPanel:hover {
+	height: 40px;
+	opacity: 1;
+	transition: height 0.1s;
+}
+
+.playerTopControlPanel {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	height: 30px;
+	border-radius: 6px 6px 0 0;
+	text-align: right;	
+}
+
+.player.fullScreen .playerTopControlPanel {
+	background: linear-gradient(to bottom, #fff, 85%, rgba(255, 255, 255, 0));
+	opacity: 0;
+	height: 5px;
+	transition: height 0.5s, opacity 1s;
+	transition-delay: 1s;
+}
+
+.player.fullScreen .playerTopControlPanel:hover {
+	height: 30px;
+	opacity: 1;
+	transition: height 0.1s;
+}
+
 .controlButtonLabel {
 	cursor: default;
 	opacity: 0.2;
 	font-size: 40px;
 	line-height: 40px;
 	color: #444;
+}
+
+.fullScreenButtonLabel {
+	font-size: 30px;
+	line-height: 35px;
 }
 
 .enabled {

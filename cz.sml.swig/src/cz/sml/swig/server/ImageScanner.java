@@ -1515,6 +1515,8 @@ public class ImageScanner implements ServletContextListener {
 		String videoUrl = readVideoUrl(mediaFile);
 		if(videoUrl.startsWith("http://youtu.be/"))
 			return videoUrl.substring("http://youtu.be/".length());
+		else if(videoUrl.startsWith("https://youtu.be/"))
+			return videoUrl.substring("https://youtu.be/".length());
 
 		throw new IOException("Invalid content of " + mediaFile.getAbsolutePath() + ": expected a simple YouTube URL");
 	}

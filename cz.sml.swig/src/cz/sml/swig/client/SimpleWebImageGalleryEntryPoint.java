@@ -1183,7 +1183,7 @@ public class SimpleWebImageGalleryEntryPoint implements EntryPoint {
 
 						final Label toggleFullScreen = new Label();
 						toggleFullScreen.setTitle("Celá obrazovka");
-						toggleFullScreen.getElement().setInnerHTML("&#x1f5b5;");
+						toggleFullScreen.getElement().setInnerHTML("&#9634;");
 						toggleFullScreen.getElement().getStyle().setDisplay(Display.INLINE);
 						toggleFullScreen.getElement().getStyle().setZIndex(2);
 						toggleFullScreen.addStyleName("controlButtonLabel");

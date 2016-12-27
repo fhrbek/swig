@@ -224,8 +224,9 @@ img {
 }
 
 .fullScreenButtonLabel {
-	font-size: 30px;
-	line-height: 35px;
+	font-size: 40px;
+	position: relative;
+	top: 4px;
 }
 
 .enabled {

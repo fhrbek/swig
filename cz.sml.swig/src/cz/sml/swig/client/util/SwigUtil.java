@@ -60,6 +60,30 @@ public class SwigUtil {
 				return browserVersion;
 			}
 
+			// Test MSIE 11+
+			regExp = RegExp.compile("Mozilla/.*\\(Windows .*; rv:(\\d+)\\.(\\d+)\\) like Gecko");
+			match = regExp.exec(agent);
+			if(match != null) {
+				browserVersion.setBrowserType(BrowserType.MSIE);
+				browserVersion.setBrowserMajorVersion(Integer.valueOf(match.getGroup(1)));
+				browserVersion.setBrowserMinorVersion(Integer.valueOf(match.getGroup(2)));
+				browserVersion.setBrowserDocumentMode(getDocumentMode());
+
+				return browserVersion;
+			}
+
+			// Test Edge
+			regExp = RegExp.compile("<WebKit Rev> Edge");
+			match = regExp.exec(agent);
+			if(match != null) {
+				browserVersion.setBrowserType(BrowserType.EDGE);
+				browserVersion.setBrowserMajorVersion(0);
+				browserVersion.setBrowserMinorVersion(0);
+				browserVersion.setBrowserDocumentMode(getDocumentMode());
+
+				return browserVersion;
+			}
+
 			// Test Chrome
 			regExp = RegExp.compile("Chrome[\\/\\s](\\d+)\\.(\\d+)");
 			match = regExp.exec(agent);
@@ -96,11 +120,12 @@ public class SwigUtil {
 
 	public static boolean isSupported(BrowserVersion browserVersion) {
 		// @fmtOff
-		return (browserVersion.getBrowserType() == BrowserType.FIREFOX && browserVersion.getBrowserMajorVersion() >= 7 ||
-				browserVersion.getBrowserType() == BrowserType.CHROME && browserVersion.getBrowserMajorVersion() >= 15 ||
-				browserVersion.getBrowserType() == BrowserType.SAFARI && browserVersion.getBrowserMajorVersion() >= 5 ||
-				browserVersion.getBrowserType() == BrowserType.OPERA && browserVersion.getBrowserMajorVersion() >= 12 ||
-				browserVersion.getBrowserType() == BrowserType.MSIE && browserVersion.getBrowserMajorVersion() >= 9 && browserVersion.getBrowserDocumentMode() >= 9);
+		return (browserVersion.getBrowserType() == BrowserType.FIREFOX && browserVersion.getBrowserMajorVersion() >= 16 ||
+				browserVersion.getBrowserType() == BrowserType.CHROME && browserVersion.getBrowserMajorVersion() >= 26 ||
+				browserVersion.getBrowserType() == BrowserType.SAFARI && browserVersion.getBrowserMajorVersion() >= 6 && browserVersion.getBrowserMinorVersion() >= 1 ||
+				browserVersion.getBrowserType() == BrowserType.OPERA && browserVersion.getBrowserMajorVersion() >= 12 && browserVersion.getBrowserMinorVersion() >= 1 ||
+				browserVersion.getBrowserType() == BrowserType.MSIE && browserVersion.getBrowserMajorVersion() >= 10 ||
+				browserVersion.getBrowserType() == BrowserType.EDGE);
 		// @fmtOn
 	}
 

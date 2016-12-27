@@ -45,4 +45,7 @@ public interface ResourceBundle extends ClientBundle {
 
 	@Source("images/browser.logo.safari.png")
 	ImageResource safari();
+
+	@Source("images/browser.logo.msie.png")
+	ImageResource msie();
 }

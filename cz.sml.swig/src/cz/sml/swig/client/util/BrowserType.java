@@ -1,10 +1,11 @@
 package cz.sml.swig.client.util;
 
-
 public enum BrowserType {
 	STANDARD("Standard Browser"),
 
 	MSIE("Microsoft Internet Explorer"),
+
+	EDGE("Microsoft Edge"),
 
 	FIREFOX("Mozilla Firefox"),
 

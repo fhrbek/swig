@@ -178,7 +178,7 @@ img {
 }
 
 .player.fullScreen .playerControlPanel {
-	background: linear-gradient(to top, #fff, 85%, rgba(255, 255, 255, 0));
+	background: linear-gradient(to top, #fff 85%, rgba(255, 255, 255, 0));
 	opacity: 0;
 	height: 5px;
 	transition: height 0.5s, opacity 1s;
@@ -202,7 +202,7 @@ img {
 }
 
 .player.fullScreen .playerTopControlPanel {
-	background: linear-gradient(to bottom, #fff, 85%, rgba(255, 255, 255, 0));
+	background: linear-gradient(to bottom, #fff 85%, rgba(255, 255, 255, 0));
 	opacity: 0;
 	height: 5px;
 	transition: height 0.5s, opacity 1s;

@@ -26,7 +26,7 @@
 		.splashScreenBase {
 			position: relative;
 			width: 500px;
-			height: 375px;
+			height: 400px;
 			margin: auto;
 			border: 1px solid transparent;
 			background-color: transparent;
@@ -124,26 +124,32 @@
 									 			</tr>
 									 			<tr>
 									 				<td><g:Image resource="{res.firefox}"/></td>
-									 				<td>Mozilla Firefox 7+</td>
+									 				<td>Mozilla Firefox 16+</td>
 									 				<td><a href="http://www.mozilla.org" target="_blank">Stáhnout</a></td>
 									 				<td>Plně kompatibilní s aplikací.</td>
 									 			</tr>
 									 			<tr>
 									 				<td><g:Image resource="{res.chrome}"/></td>
-									 				<td>Google Chrome 15+</td>
+									 				<td>Google Chrome 26+</td>
 									 				<td><a href="https://www.google.com/chrome" target="_blank">Stáhnout</a></td>
 									 				<td>Plně kompatibilní s aplikací.</td>
 									 			</tr>
 									 			<tr>
 									 				<td><g:Image resource="{res.opera}"/></td>
-									 				<td>Opera 12+</td>
+									 				<td>Opera 12.1+</td>
 									 				<td><a href="http://www.opera.com/download" target="_blank">Stáhnout</a></td>
 									 				<td>Plně kompatibilní s aplikací.</td>
 									 			</tr>
 									 			<tr>
 									 				<td><g:Image resource="{res.safari}"/></td>
-									 				<td>Safari 5+</td>
+									 				<td>Safari 6.1+</td>
 									 				<td><a href="http://www.apple.com/safari" target="_blank">Stáhnout</a></td>
+									 				<td>Plně kompatibilní s aplikací.</td>
+									 			</tr>
+									 			<tr>
+									 				<td><g:Image resource="{res.msie}"/></td>
+									 				<td>MSIE 10+/Edge</td>
+									 				<td><a href="https://www.microsoft.com/cs-cz/windows/microsoft-edge" target="_blank">Stáhnout</a></td>
 									 				<td>Plně kompatibilní s aplikací.</td>
 									 			</tr>
 									 		</table>

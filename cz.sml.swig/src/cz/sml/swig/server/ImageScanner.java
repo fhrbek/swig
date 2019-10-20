@@ -37,6 +37,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
+import javax.media.jai.JAI;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.Cookie;
@@ -445,7 +446,7 @@ public class ImageScanner implements ServletContextListener {
 			boolean isVideo = false;
 
 			if(isImage(mediaFile.getName()))
-				image = ImageIO.read(mediaFile);
+				image = JAI.create("fileload", mediaFile.getAbsolutePath()).getAsBufferedImage();
 			else if(isVideo(mediaFile.getName())) {
 				image = readVideoSplashImage(mediaFile);
 				isVideo = true;
@@ -490,7 +491,7 @@ public class ImageScanner implements ServletContextListener {
 			boolean isVideo = false;
 
 			if(isImage(mediaFile.getName()))
-				image = ImageIO.read(mediaFile);
+				image = JAI.create("fileload", mediaFile.getAbsolutePath()).getAsBufferedImage();
 			else if(isVideo(mediaFile.getName())) {
 				image = readVideoSplashImage(mediaFile);
 				isVideo = true;

@@ -19,6 +19,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,7 +90,7 @@ public class ImageScanner implements ServletContextListener {
 	private static final String REFRESH_FILE = ".refresh";
 
 	private static final String VERSION_FILE = ".version";
-
+	
 	private static final Comparator<FolderMetadata> INVERSE_COMPARATOR = new Comparator<FolderMetadata>() {
 
 		@Override
@@ -446,7 +447,7 @@ public class ImageScanner implements ServletContextListener {
 			boolean isVideo = false;
 
 			if(isImage(mediaFile.getName()))
-				image = JAI.create("fileload", mediaFile.getAbsolutePath()).getAsBufferedImage();
+				image = tryToReadImage(mediaFile);
 			else if(isVideo(mediaFile.getName())) {
 				image = readVideoSplashImage(mediaFile);
 				isVideo = true;
@@ -485,13 +486,74 @@ public class ImageScanner implements ServletContextListener {
 
 			writeImage(mediaFile, adjustOrientation(thumbImage, getOrientation(mediaFile)), THUMBNAIL_FOLDER);
 		}
+		
+		private BufferedImage tryToReadImage(File imageFile) throws IOException {
+			BufferedImage image;
+			
+			try {
+				image = ImageIO.read(imageFile);
+			}
+			catch(IOException e) {
+				log(Level.WARNING, "Cannot read " + imageFile.getName() + " with standard IO: " + e.getMessage() + ", trying another method...");
+				
+				try {
+					image = JAI.create("fileload", imageFile.getAbsolutePath()).getAsBufferedImage();
+				}
+				catch(Exception e1) {
+					log(Level.WARNING, "Cannot read " + imageFile.getName() + " with JAI: " + e1.getMessage() + ", trying another method...");
+					
+					try {
+						String extension = null;
+						String fileName = imageFile.getName();
+
+						int i = fileName.lastIndexOf('.');
+						if (i > 0) {
+						    extension = fileName.substring(i);
+						}
+						File tempTarget = File.createTempFile(fileName, extension);
+						tempTarget.deleteOnExit();
+						log(Level.INFO, "Trying to convert " + fileName + " into " + tempTarget.getAbsolutePath() + "...");
+						List<String> command = new ArrayList<String>();
+						command.add("convert"); // call ImageMagick (hopefully installed)
+						command.add(imageFile.getAbsolutePath());
+						command.add(tempTarget.getAbsolutePath());
+						ProcessBuilder builder = new ProcessBuilder(command);
+						builder.redirectError();
+						builder.redirectOutput();
+						Process process = builder.start();
+						process.waitFor();
+						if (process.exitValue() != 0) {
+							tempTarget.delete();
+							throw new Exception("ImageMagick failed (is it installed?) - see servlet container log for more details");
+						}
+						imageFile.renameTo(new File(imageFile.getAbsolutePath() + ".original"));
+						try {
+							Files.copy(tempTarget.toPath(), imageFile.toPath());
+						} catch (Exception e2) {
+							new File(imageFile.getAbsolutePath() + ".original").renameTo(imageFile);
+							throw new Exception("Unable to move temporary file to original location: " + imageFile.getAbsolutePath() + "(" + e2.getMessage() + ")");
+						}
+						finally {
+							tempTarget.delete();
+						}
+						log(Level.INFO, "Trying to load converted file " + fileName);
+						image = ImageIO.read(imageFile);
+					} catch (Exception e3) {
+						log(Level.WARNING, "Failed to use alternative methods for " + imageFile.getName() + ": " + e3.getMessage());
+						throw new IOException("All image reading methods failed, see warnings above");
+					}
+				}
+			}
+			
+			return image;
+		}
 
 		private void updatePreview(File mediaFile) throws IOException, ImageProcessingException, MetadataException {
 			Image image;
 			boolean isVideo = false;
 
 			if(isImage(mediaFile.getName()))
-				image = JAI.create("fileload", mediaFile.getAbsolutePath()).getAsBufferedImage();
+				image = tryToReadImage(mediaFile);
 			else if(isVideo(mediaFile.getName())) {
 				image = readVideoSplashImage(mediaFile);
 				isVideo = true;
@@ -789,6 +851,8 @@ public class ImageScanner implements ServletContextListener {
 		StringBuilder report = new StringBuilder();
 
 		report.append("Image Scanner started on " + instance.startTime.toString());
+		report.append('\n');
+		report.append("Java version is " + System.getProperty("java.version"));
 		report.append('\n');
 		report.append("Root directory is set to " + instance.swigRoot.getAbsolutePath());
 		report.append('\n');

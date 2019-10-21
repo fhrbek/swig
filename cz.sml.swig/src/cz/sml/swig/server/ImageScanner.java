@@ -515,6 +515,9 @@ public class ImageScanner implements ServletContextListener {
 						log(Level.INFO, "Trying to convert " + fileName + " into " + tempTarget.getAbsolutePath() + "...");
 						List<String> command = new ArrayList<String>();
 						command.add("convert"); // call ImageMagick (hopefully installed)
+						command.add("-strip");  // keep only one colorspace etc.
+						command.add("-colorspace");
+						command.add("RGB");     // convert to RGB (otherwise java won't read it)
 						command.add(imageFile.getAbsolutePath());
 						command.add(tempTarget.getAbsolutePath());
 						ProcessBuilder builder = new ProcessBuilder(command);

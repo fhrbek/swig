@@ -514,10 +514,11 @@ public class ImageScanner implements ServletContextListener {
 						tempTarget.deleteOnExit();
 						log(Level.INFO, "Trying to convert " + fileName + " into " + tempTarget.getAbsolutePath() + "...");
 						List<String> command = new ArrayList<String>();
-						command.add("convert"); // call ImageMagick (hopefully installed)
-						command.add("-strip");  // keep only one colorspace etc.
+						command.add("convert");      // call ImageMagick (hopefully installed)
+						command.add("-strip");       // keep only one colorspace etc.
+						command.add("-auto-orient"); // rotate the image now because with -strip we'll lose the info
 						command.add("-colorspace");
-						command.add("RGB");     // convert to RGB (otherwise java won't read it)
+						command.add("RGB");          // convert to RGB (otherwise java won't read it)
 						command.add(imageFile.getAbsolutePath());
 						command.add(tempTarget.getAbsolutePath());
 						ProcessBuilder builder = new ProcessBuilder(command);
